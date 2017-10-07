@@ -101,10 +101,35 @@ class SCB:
         r = requests.post(url, data=json.dumps(data), headers=headers)
         print r.text
 
-    def download_table(self, id):
-        '''
-        Lets the user download the table
-        '''
+    def download_table(self, id, response_format, filt={}):
+        url = self.cururl + id
+        r = requests.get(url)
+
+        table = json.loads(r.text)
+
+        print table['title']
+
+        headers = {'content-type': 'text/csv', 'accept': 'text/csv'}
+        data = {'query': []}
+
+        for variable in table['variables']:
+
+            if variable['code'] in filt:
+                # Perform filtering
+                print 'Filter: Code=' + variable['code']
+                data['query'].append({'code': variable['code'], 'selection': {'filter': 'item', 'values': filt[variable['code']]}})
+            else:
+                #NoFilterNeeded
+                print 'NoFilterNeeded: Code=' + variable['code']
+                data['query'].append({'code': variable['code'], 'selection': {'filter': 'item', 'values': variable['values']}})
+
+        data['response'] = {'format': response_format}
+
+        print data
+
+        r = requests.post(url, data=json.dumps(data), headers=headers)
+
+        return r
 
 if __name__ == '__main__':
     print 'working'
