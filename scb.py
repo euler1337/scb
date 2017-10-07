@@ -107,8 +107,6 @@ class SCB:
 
         table = json.loads(r.text)
 
-        print table['title']
-
         headers = {'content-type': 'text/csv', 'accept': 'text/csv'}
         data = {'query': []}
 
@@ -116,16 +114,12 @@ class SCB:
 
             if variable['code'] in filt:
                 # Perform filtering
-                print 'Filter: Code=' + variable['code']
                 data['query'].append({'code': variable['code'], 'selection': {'filter': 'item', 'values': filt[variable['code']]}})
             else:
                 #NoFilterNeeded
-                print 'NoFilterNeeded: Code=' + variable['code']
                 data['query'].append({'code': variable['code'], 'selection': {'filter': 'item', 'values': variable['values']}})
 
         data['response'] = {'format': response_format}
-
-        print data
 
         r = requests.post(url, data=json.dumps(data), headers=headers)
 
